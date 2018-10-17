@@ -1,5 +1,5 @@
 # drupal-views-slides-plugin
-Drupal 6 Views Style plugin that displays results using the SlidesJS http://slidesjs.com/ plugin for JQuery.
+Drupal 6 Views Style plugin that displays results using the SlidesJS http://slidesjs.com/ (https://github.com/nathansearles/Slides/tree/SlidesJS-3) plugin for JQuery.
 
 [DEMO](http://www.quovadiscom.com/content/drupal-views-slides-plugin)
 
