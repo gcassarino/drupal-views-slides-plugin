@@ -9,7 +9,7 @@ This module provides a new Style option called "slides" when choosing the Displa
 
 The module should work as it is, the files slides.min.jquery.js and updated JQuery are located inside the "slides/js/" module's folder.
 
-Access to plugin settings page to adjust the options. Options from Slides plugin are available.
+![slides-views settings](http://www.quovadiscom.com/sites/default/files/slides-views-sshot.jpg "slides-views settings") Access to plugin settings page to adjust the options. Options from Slides plugin are available.
 
 SlidesJS plugin actually support 3 events: on start, stop and on load. Select the desired event (optionally) in the plugin Style settings and then modify the corresponding files inside the module's folder as you wish. The files are event_init.js, event_slidesLoaded.js, event_completed.js
 
