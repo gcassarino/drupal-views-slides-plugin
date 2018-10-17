@@ -1,0 +1,5 @@
+name = Views Slides
+description = Style plugin that displays results using the Slides plugin for jQuery, http://slidesjs.com/ - 2012 Gianluca Cassarino gcassarino@gmail.com
+core = 6.x
+dependencies[] = views
+package = Views

@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * Implements hook_views_api().
+ */
+function views_slides_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
+
+/**
+ * Views Slides: preprocess function.
+ */
+function template_preprocess_views_slides(&$vars) {
+  $vars['options']['preloadImage'] = filter_xss_admin($vars['options']['preloadImage']);
+  $vars['options']['container'] = filter_xss_admin($vars['options']['container']);
+  $vars['options']['next'] = filter_xss_admin($vars['options']['next']);
+  $vars['options']['prev'] = filter_xss_admin($vars['options']['prev']);
+  $vars['options']['paginationClass'] = filter_xss_admin($vars['options']['paginationClass']);
+  $vars['options']['currentClass'] = filter_xss_admin($vars['options']['currentClass']);
+  $vars['options']['fadeSpeed'] = filter_xss_admin($vars['options']['fadeSpeed']);
+  $vars['options']['fadeEasing'] = filter_xss_admin($vars['options']['fadeEasing']);
+  $vars['options']['slideSpeed'] = filter_xss_admin($vars['options']['slideSpeed']);
+  $vars['options']['slideEasing'] = filter_xss_admin($vars['options']['customcsspath']);
+  $vars['options']['start'] = filter_xss_admin($vars['options']['start']);
+  $effect_options = array_filter($vars['options']['effect'], create_function('$value', 'if ($value) {return $value;} else {return false;}'));
+  $vars['options']['effect'] = (empty($effect_options)) ? 'slide' : filter_xss_admin(implode(",", $effect_options));
+  $vars['options']['play'] = filter_xss_admin($vars['options']['play']);
+  $vars['options']['pause'] = filter_xss_admin($vars['options']['pause']);
+  $vars['options']['autoHeightSpeed'] = filter_xss_admin($vars['options']['autoHeightSpeed']);
+
+  $slides_module_path = drupal_get_path('module', 'views_slides');
+    
+  drupal_add_js($slides_module_path .'/slides/js/jquery.min.js'); // IMPORTANT: slidejs works with jQuery versions 1.4.4+ 
+  drupal_add_js($slides_module_path .'/slides/js/slides.min.jquery.js');
+
+  $js_options = array( 
+    'preload' => $vars['options']['preload'] ? true : false,
+    'preloadImage' => $vars['options']['preloadImage'],
+    'container' => $vars['options']['container'],
+    'generateNextPrev' => $vars['options']['generateNextPrev'] ? true : false,
+    'next' => $vars['options']['next'],
+    'prev' => $vars['options']['prev'],
+    'pagination' => $vars['options']['pagination'] ? true : false,
+    'generatePagination' => $vars['options']['generatePagination'] ? true : false,
+    'prependPagination' => $vars['options']['prependPagination'] ? true : false,
+    'paginationClass' => $vars['options']['paginationClass'],
+    'currentClass' => $vars['options']['currentClass'],
+    'fadeSpeed' => (int)$vars['options']['fadeSpeed'],
+    'fadeEasing' => $vars['options']['fadeEasing'],
+    'slideSpeed' => (int)$vars['options']['slideSpeed'],
+    'slideEasing' => $vars['options']['slideEasing'],
+    'start' => (int)$vars['options']['start'],
+    'effect' => $vars['options']['effect'],
+    'crossfade' => $vars['options']['crossfade'] ? true : false,
+    'randomize' => $vars['options']['randomize'] ? true : false,
+    'play' => (int)$vars['options']['play'],
+    'pause' => (int)$vars['options']['pause'],
+    'hoverPause' => $vars['options']['hoverPause'] ? true : false,
+    'autoHeight' => $vars['options']['autoHeight'] ? true : false,
+    'autoHeightSpeed' => (int)$vars['options']['autoHeightSpeed'],
+    'bigTarget' => $vars['options']['bigTarget'] ? true : false,
+  );
+
+  drupal_add_js(array("view_{$vars['view']->name}" => $js_options), 'setting');
+
+  $event_start = $vars['options']['animationStart'] ? file_get_contents($slides_module_path . '/event_start.js') : 'function() {}';
+
+  $event_completed = $vars['options']['animationComplete'] ? file_get_contents($slides_module_path . '/event_completed.js') : 'function() {}';
+
+  $event_slidesLoaded = $vars['options']['slidesLoaded'] ? file_get_contents($slides_module_path . '/event_slidesLoaded.js') : 'function() {}';
+
+  // Drupal.behaviors.views_slides is executed on document ready every page change, needed for ajax pager
+  // see http://drupal.org/node/1058168 about Drupal and JQuery versions.
+  if (Drupal.jsEnabled) {
+    drupal_add_js('
+    var $jq = jQuery.noConflict();
+    (function($jq) {
+      function slides_init() {
+	var slides_settings_obj = Drupal.settings.view_'. $vars['view']->name.';	
+	$jq(\'#slides-'. $vars['view']->name .'\').slides({ 
+	  preload : slides_settings_obj.preload ,
+	  preloadImage : slides_settings_obj.preloadImage,        
+	  container : slides_settings_obj.container,            
+	  generateNextPrev : slides_settings_obj.generateNextPrev,     
+	  next : slides_settings_obj.next, 
+	  prev : slides_settings_obj.prev, 
+	  pagination : slides_settings_obj.pagination,            
+	  generatePagination : slides_settings_obj.generatePagination,
+	  prependPagination : slides_settings_obj.prependPagination,          
+	  paginationClass : slides_settings_obj.paginationClass,      
+	  currentClass : slides_settings_obj.currentClass,         
+	  fadeSpeed : slides_settings_obj.fadeSpeed, 
+	  fadeEasing : slides_settings_obj.fadeEasing, 
+	  slideSpeed : slides_settings_obj.slideSpeed,
+	  slideEasing : slides_settings_obj.slideEasing,
+	  start : slides_settings_obj.start,
+	  effect : slides_settings_obj.effect,
+	  crossfade : slides_settings_obj.crossfade,
+	  randomize : slides_settings_obj.randomize,
+	  play : slides_settings_obj.play,
+	  pause : slides_settings_obj.pause,
+	  hoverPause : slides_settings_obj.hoverPause,
+	  autoHeight : slides_settings_obj.autoHeight,
+	  autoHeightSpeed : slides_settings_obj.autoHeightSpeed,
+	  bigTarget : slides_settings_obj.bigTarget,        
+	  animationStart     : ' . $event_start . ',        
+	  animationComplete  : ' . $event_completed . ',
+	  slidesLoaded       : ' . $event_slidesLoaded . '
+	});
+      }     
+      Drupal.behaviors.views_slides = function (context) {
+	slides_init();	
+      };
+    })(jQuery);
+    ', 'inline', 'footer');
+  }
+}
