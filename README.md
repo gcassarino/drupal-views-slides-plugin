@@ -1,7 +1,7 @@
 # drupal-views-slides-plugin
 Drupal 6 Views Style plugin that displays results using the SlidesJS http://slidesjs.com/ (https://github.com/nathansearles/Slides/tree/SlidesJS-3) plugin for JQuery.
 
-[DEMO](http://www.quovadiscom.com/content/drupal-views-slides-plugin)
+[DEMO](https://www.quovadiscom.com/old-site/www.quovadiscom.com/content/drupal-views-slides-plugin/index.html)
 
 Slides uses a version of jQuery 1.4.4 above, in this case 1.6.2 is used. The method "jQuery.noConflict" is used to avoid breaking other scripts on the page. It should work. Drupal Ajax pager is supported.
 
